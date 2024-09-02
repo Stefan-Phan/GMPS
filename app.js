@@ -9,11 +9,17 @@ const bookingRouter = require('./routes/booking')
 const doctorRouter = require('./routes/doctor')
 const adminRouter = require('./routes/admin/ad_doctor')
 
+// middleware
+const authenticateUser = require('./middleware/authentication')
+const adminAuth = require('./middleware/adminAuthenticate')
+
+app.use(express.json());
+
 // routes
 app.use("/api/v1/auth", authRouter)
 app.use("/api/v1/doctors", doctorRouter)
-app.use("/api/v1/bookings", bookingRouter)
-app.use("/api/v1/admin", adminRouter)
+app.use("/api/v1/bookings", authenticateUser, bookingRouter)
+app.use("/api/v1/admin", adminAuth, adminRouter)
 
 // connect DB
 const connectDB = require('./db/connect')

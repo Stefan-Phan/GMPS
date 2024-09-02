@@ -1,7 +1,7 @@
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 
-const auth = async (req, res, next) => {
+const adminAuth = async (req, res, next) => {
     const authHeader = req.headers.authorization
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -17,3 +17,5 @@ const auth = async (req, res, next) => {
         return res.status(401).json({error: 'Authentication Invalid'})
     }
 }
+
+module.exports = adminAuth

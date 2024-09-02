@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const validator = require("validator");
+// const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -15,10 +15,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please provide email"],
       unique: true,
-      validate: {
-        validator: (value) => validator.isEmail(value),
-        message: "Email must be valid",
-      },
+      // validate: {
+      //   validator: (value) => validator.isEmail(value),
+      //   message: "Email must be valid",
+      // },
     },
     password: {
       type: String,
@@ -28,10 +28,10 @@ const UserSchema = new mongoose.Schema(
     phoneNumber: {
       type: String,
       required: [true, "Please provide phone number"],
-      validate: {
-        validator: (value) => validator.isMobilePhone(value),
-        message: "Phone number must be valid",
-      },
+      // validate: {
+      //   validator: (value) => validator.isMobilePhone(value),
+      //   message: "Phone number must be valid",
+      // },
     },
     role: {
       type: String,
