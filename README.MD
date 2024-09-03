@@ -22,7 +22,7 @@ The General Medical Practice System (GMPS) is a comprehensive backend solution d
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/gmps.git
+   git clone https://github.com/Stefan-Phan/gmps.git
    ```
 
 2. Navigate to the project directory:
