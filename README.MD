@@ -129,6 +129,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Contact
 
-Your Name - your.email@example.com
+Stefan Phan - phannguyentuanhung2005gmail.com
 
-Project Link: [https://github.com/yourusername/gmps](https://github.com/yourusername/gmps)
+Project Link: https://github.com/Stefan-Phan/GMPS
