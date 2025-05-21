@@ -19,6 +19,19 @@ const getBooking = async (req, res) => {
   res.status(StatusCodes.OK).json({ booking });
 };
 
+const getDoctorBookings = async (req, res) => {
+  const { doctorId } = req.params;
+
+  if (!doctorId) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ error: "Missing doctor ID" });
+  }
+
+  const bookings = await Booking.find({ doctorId }).sort("appointmentDate");
+  res.status(StatusCodes.OK).json({ bookings, count: bookings.length });
+};
+
 const createBooking = async (req, res) => {
   const { doctorId, appointmentDate, slot } = req.body;
 
@@ -116,4 +129,5 @@ export default {
   createBooking,
   updateBooking,
   deleteBooking,
+  getDoctorBookings,
 };
