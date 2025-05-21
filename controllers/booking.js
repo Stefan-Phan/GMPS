@@ -2,6 +2,7 @@ import Booking from "../models/booking.js";
 import { StatusCodes } from "http-status-codes";
 import { validateBookingFields } from "../middleware/validateBookingFields.js";
 import { checkDoctorAvailability } from "../middleware/checkDoctorAvailability.js";
+import { sendBookingConfirmation } from "../utils/sendEmail.js";
 
 const getAllBookings = async (req, res) => {
   const bookings = await Booking.find().sort("appointmentDate");
@@ -33,7 +34,7 @@ const getDoctorBookings = async (req, res) => {
 };
 
 const createBooking = async (req, res) => {
-  const { doctorId, appointmentDate, slot } = req.body;
+  const { doctorId, appointmentDate, slot, email, name } = req.body;
 
   if (!validateBookingFields(doctorId, appointmentDate, slot, res)) return;
 
@@ -59,6 +60,19 @@ const createBooking = async (req, res) => {
 
   req.body.bookedBy = req.user.userId;
   const booking = await Booking.create(req.body);
+
+  try {
+    await sendBookingConfirmation({
+      to: email,
+      name: name,
+      doctorName: doctor.name,
+      date: appointmentDate,
+      slot,
+    });
+  } catch (err) {
+    console.error("Failed to send booking confirmation email:", err);
+  }
+
   res.status(StatusCodes.CREATED).json({ booking });
 };
 
