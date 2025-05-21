@@ -2,8 +2,6 @@
 
 A full-featured medical appointment booking system that allows users to register, browse available doctors, book appointments, and receive email notifications. Built with modern technologies and security best practices. Future development includes AI integration to support users with health-related advice before they see a doctor.
 
----
-
 ## 🌐 Live Demo (Optional)
 
 > Coming soon...
@@ -35,8 +33,6 @@ A full-featured medical appointment booking system that allows users to register
 | POST   | `/register` | Register a new user  |
 | POST   | `/login`    | Log in existing user |
 | GET    | `/logout`   | Log out the user     |
-
----
 
 ### 🧑‍⚕️ Doctor Routes (`/api/v1/doctors`)
 
