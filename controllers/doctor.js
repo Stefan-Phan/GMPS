@@ -1,55 +1,60 @@
+// controllers/doctorController.js
 import Doctor from "../models/doctor.js";
 import { StatusCodes } from "http-status-codes";
+import {
+  handleDuplicateKeyError,
+  handleGenericError,
+  sendDoctorNotFound,
+} from "../utils/errorHandler.js";
+import { validateDoctorInput } from "../middleware/validateDoctorInput.js";
 
 const getAllDoctors = async (req, res) => {
   const doctors = await Doctor.find().sort("name");
-  res.status(StatusCodes.OK).json({ doctors, count: doctors.length });
+  return res.status(StatusCodes.OK).json({ doctors, count: doctors.length });
 };
 
 const getDoctor = async (req, res) => {
-  const doctorId = req.params.id;
-
+  const { id: doctorId } = req.params;
   const doctor = await Doctor.findOne({ _id: doctorId });
+
   if (!doctor) {
-    return res
-      .status(StatusCodes.NOT_FOUND)
-      .json({ error: `There is no doctor with id ${doctorId}` });
+    return sendDoctorNotFound(res, doctorId);
   }
-  res.status(StatusCodes.OK).json({ doctor });
+
+  return res.status(StatusCodes.OK).json({ doctor });
 };
 
 const createDoctor = async (req, res) => {
-  req.body.createdBy = req.user.userId;
-  const doctor = await Doctor.create(req.body);
-  res.status(StatusCodes.CREATED).json({ doctor });
+  try {
+    req.body.createdBy = req.user.userId;
+    const doctor = await Doctor.create(req.body);
+    return res.status(StatusCodes.CREATED).json({ doctor });
+  } catch (error) {
+    if (error.code === 11000) return handleDuplicateKeyError(error, res);
+    return handleGenericError(res);
+  }
 };
 
 const updateDoctor = async (req, res) => {
-  const {
-    body: { name, speciality },
-    user: { userId },
-    params: { id: doctorId },
-  } = req;
+  const { id: doctorId } = req.params;
 
-  if (name === "" || speciality === "") {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .send("Name and speciality cannot be empty");
+  if (!validateDoctorInput(req, res)) return;
+
+  try {
+    const doctor = await Doctor.findOneAndUpdate({ _id: doctorId }, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!doctor) {
+      return sendDoctorNotFound(res, doctorId);
+    }
+
+    return res.status(StatusCodes.OK).json({ doctor });
+  } catch (error) {
+    if (error.code === 11000) return handleDuplicateKeyError(error, res);
+    return handleGenericError(res);
   }
-
-  const doctor = await Doctor.findByIdAndUpdate(
-    { _id: doctorId, createdBy: userId },
-    req.body,
-    { new: true, runValidators: true }
-  );
-
-  if (!doctor) {
-    return res
-      .status(StatusCodes.NOT_FOUND)
-      .send(`No doctor with id ${doctorId} found for this user`);
-  }
-
-  res.status(StatusCodes.OK).json({ doctor });
 };
 
 const deleteDoctor = async (req, res) => {
@@ -58,17 +63,16 @@ const deleteDoctor = async (req, res) => {
     params: { id: doctorId },
   } = req;
 
-  const doctor = await Doctor.findByIdAndDelete({
+  const doctor = await Doctor.findOneAndDelete({
     _id: doctorId,
     createdBy: userId,
   });
 
   if (!doctor) {
-    return res
-      .status(StatusCodes.NOT_FOUND)
-      .send(`No doctor with id ${doctorId} found for this user`);
+    return sendDoctorNotFound(res, doctorId);
   }
-  res
+
+  return res
     .status(StatusCodes.OK)
     .send(`Successfully deleted doctor with id ${doctorId}`);
 };

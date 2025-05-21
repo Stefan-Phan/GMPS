@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 
-const errorHandlerMiddleWare = (err, req, res, next) => {
+const errorHandlerMiddleWare = (err, res) => {
   let customError = {
     statusCode: err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
     msg: err.message || "Something went wrong try again later",

@@ -11,7 +11,6 @@ const defaultAvailability = [
 const DoctorSchema = new Schema({
   name: {
     type: String,
-    unique: true,
     required: [true, "Please provide a name"],
     minlength: [3, "name must be at least 3 characters long"],
     maxlength: [50, "name must be at most 50 characters long"],
