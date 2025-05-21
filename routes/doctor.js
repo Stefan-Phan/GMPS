@@ -1,9 +1,11 @@
-const express = require('express')
-const router = express.Router()
+import { Router } from "express";
+const router = Router();
 
-const {getAllDoctors, getDoctor} = require('../controllers/doctor')
+import doctorController from "../controllers/doctor.js";
 
-router.route('/').get(getAllDoctors)
-router.route('/:id').get(getDoctor)
+const { getAllDoctors, getDoctor } = doctorController;
 
-module.exports = router
+router.route("/").get(getAllDoctors);
+router.route("/:id").get(getDoctor);
+
+export default router;

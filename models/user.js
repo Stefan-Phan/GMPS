@@ -1,9 +1,8 @@
-const mongoose = require("mongoose");
-// const validator = require("validator");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+import { Schema, model } from "mongoose";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
-const UserSchema = new mongoose.Schema(
+const UserSchema = new Schema(
   {
     name: {
       type: String,
@@ -15,10 +14,6 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please provide email"],
       unique: true,
-      // validate: {
-      //   validator: (value) => validator.isEmail(value),
-      //   message: "Email must be valid",
-      // },
     },
     password: {
       type: String,
@@ -28,15 +23,11 @@ const UserSchema = new mongoose.Schema(
     phoneNumber: {
       type: String,
       required: [true, "Please provide phone number"],
-      // validate: {
-      //   validator: (value) => validator.isMobilePhone(value),
-      //   message: "Phone number must be valid",
-      // },
     },
     role: {
       type: String,
-      enum: ["user", "admin"],
-      default: "user",
+      enum: ["admin", "doctor", "patient"],
+      default: "patient",
     },
   },
   { timestamps: true }
@@ -59,7 +50,7 @@ UserSchema.methods.createJWT = function () {
 };
 
 UserSchema.methods.comparePassword = async function (candidatePassword) {
-  const isMatch = await bcrypt.compare(candidatePassword, this.password);
+  const isMatch = await compare(candidatePassword, this.password);
   return isMatch;
 };
-module.exports = mongoose.model("User", UserSchema);
+export default model("User", UserSchema);

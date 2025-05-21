@@ -1,9 +1,11 @@
-const express = require('express')
-const router = express.Router()
+import { Router } from "express";
+const router = Router();
 
-const { createDoctor, deleteDoctor, updateDoctor } = require('../../controllers/doctor')
+import doctorController from "../../controllers/doctor.js";
 
-router.route('/').post(createDoctor)
-router.route('/:id').delete(deleteDoctor).patch(updateDoctor)
+const { createDoctor, deleteDoctor, updateDoctor } = doctorController;
 
-module.exports = router
+router.route("/").post(createDoctor);
+router.route("/:id").delete(deleteDoctor).patch(updateDoctor);
+
+export default router;

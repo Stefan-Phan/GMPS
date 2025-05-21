@@ -1,5 +1,5 @@
-const User = require("../models/user");
-const jwt = require("jsonwebtoken");
+import User from "../models/user.js";
+import jwt from "jsonwebtoken";
 
 const auth = async (req, res, next) => {
   //check header
@@ -19,4 +19,4 @@ const auth = async (req, res, next) => {
   }
 };
 
-module.exports = auth;
+export default auth;

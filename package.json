@@ -1,5 +1,6 @@
 {
   "name": "gmps",
+  "type": "module",
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
@@ -10,6 +11,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "a": "^3.0.1",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.4.5",

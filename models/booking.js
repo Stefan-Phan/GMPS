@@ -1,10 +1,20 @@
-const mongoose = require("mongoose");
-const validator = require("validator");
+import { Schema, Types, model } from "mongoose";
 
-const BookingSchema = new mongoose.Schema(
+import validator from "validator";
+
+const { isEmail } = validator;
+
+const TIME_SLOTS = [
+  { start: "09:00", end: "11:00" },
+  { start: "11:00", end: "13:00" },
+  { start: "13:00", end: "15:00" },
+  { start: "15:00", end: "17:00" },
+];
+
+const BookingSchema = new Schema(
   {
     doctorId: {
-      type: mongoose.Types.ObjectId,
+      type: Types.ObjectId,
       ref: "Doctor",
     },
     name: {
@@ -17,7 +27,7 @@ const BookingSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please provide email"],
       validate: {
-        validator: (value) => validator.isEmail(value),
+        validator: (value) => isEmail(value),
         message: "Email must be valid",
       },
     },
@@ -26,15 +36,15 @@ const BookingSchema = new mongoose.Schema(
       enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
       required: [true, "Please provide the appointment date"],
     },
-    appointmentTime: {
+    appointmentStartTime: {
       type: String,
-      required: [true, "Please provide the appointment time"],
-      validate: {
-        validator: function(value) {
-          return /^([01]\d|2[0-3]):([0-5]\d)$/.test(value);
-        },
-        message: "Appointment time must be in HH:MM format"
-      }
+      required: [true, "Please provide the appointment start time"],
+      enum: ["09:00", "11:00", "13:00", "15:00"],
+    },
+    appointmentEndTime: {
+      type: String,
+      required: [true, "Please provide the appointment end time"],
+      enum: ["11:00", "13:00", "15:00", "17:00"],
     },
     reason: {
       type: String,
@@ -54,4 +64,4 @@ const BookingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Booking", BookingSchema);
+export default model("Booking", BookingSchema);

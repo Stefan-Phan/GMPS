@@ -1,6 +1,5 @@
-const User = require("../models/user");
-const jwt = require("jsonwebtoken");
-const { StatusCodes } = require("http-status-codes");
+import User from "../models/user.js";
+import jwt from "jsonwebtoken";
 
 const adminAuth = async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -25,4 +24,4 @@ const adminAuth = async (req, res, next) => {
   }
 };
 
-module.exports = adminAuth;
+export default adminAuth;

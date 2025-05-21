@@ -1,5 +1,5 @@
-const Doctor = require("../models/doctor");
-const { StatusCodes } = require("http-status-codes");
+import Doctor from "../models/doctor.js";
+import { StatusCodes } from "http-status-codes";
 
 const getAllDoctors = async (req, res) => {
   const doctors = await Doctor.find().sort("name");
@@ -44,7 +44,9 @@ const updateDoctor = async (req, res) => {
   );
 
   if (!doctor) {
-    return res.status(StatusCodes.OK).send(`No doctor with id ${doctorId}`);
+    return res
+      .status(StatusCodes.NOT_FOUND)
+      .send(`No doctor with id ${doctorId} found for this user`);
   }
 
   res.status(StatusCodes.OK).json({ doctor });
@@ -58,17 +60,20 @@ const deleteDoctor = async (req, res) => {
 
   const doctor = await Doctor.findByIdAndDelete({
     _id: doctorId,
+    createdBy: userId,
   });
 
   if (!doctor) {
-    return res.status(StatusCodes.OK).send(`No doctor with id ${doctorId}`);
+    return res
+      .status(StatusCodes.NOT_FOUND)
+      .send(`No doctor with id ${doctorId} found for this user`);
   }
   res
     .status(StatusCodes.OK)
-    .send(`Successfully delete doctor with id ${doctorId}`);
+    .send(`Successfully deleted doctor with id ${doctorId}`);
 };
 
-module.exports = {
+export default {
   getAllDoctors,
   getDoctor,
   createDoctor,

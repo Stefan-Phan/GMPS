@@ -1,25 +1,26 @@
-require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
 
-const express = require("express");
+import express, { json } from "express";
 const app = express();
 
-const cookieParser = require("cookie-parser");
+import cookieParser from "cookie-parser";
 
 // routes
-const authRouter = require("./routes/auth");
-const bookingRouter = require("./routes/booking");
-const doctorRouter = require("./routes/doctor");
-const adminRouter = require("./routes/admin/ad_doctor");
+import authRouter from "./routes/auth.js";
+import bookingRouter from "./routes/booking.js";
+import doctorRouter from "./routes/doctor.js";
+import adminRouter from "./routes/admin/ad_doctor.js";
 
 // middleware
-const authenticateUser = require("./middleware/authentication");
-const adminAuth = require("./middleware/adminAuthenticate");
+import authenticateUser from "./middleware/authentication.js";
+import adminAuth from "./middleware/adminAuthenticate.js";
 
 // error handler
-const notFoundMiddleWare = require("./middleware/not-found");
-const errorHandlerMiddleWare = require("./middleware/error-handler");
+import notFoundMiddleWare from "./middleware/not-found.js";
+import errorHandlerMiddleWare from "./middleware/error-handler.js";
 
-app.use(express.json());
+app.use(json());
 app.use(cookieParser());
 
 // routes
@@ -33,7 +34,7 @@ app.use(notFoundMiddleWare);
 app.use(errorHandlerMiddleWare);
 
 // connect DB
-const connectDB = require("./db/connect");
+import connectDB from "./db/connect.js";
 
 const port = process.env.PORT || 3000;
 

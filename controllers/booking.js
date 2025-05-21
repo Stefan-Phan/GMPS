@@ -1,6 +1,6 @@
-const Booking = require("../models/booking");
-const Doctor = require("../models/doctor");
-const { StatusCodes } = require("http-status-codes");
+import Booking from "../models/booking.js";
+import Doctor from "../models/doctor.js";
+import { StatusCodes } from "http-status-codes";
 
 const getAllBookings = async (req, res) => {
   const bookings = await Booking.find()
@@ -30,7 +30,6 @@ const createBooking = async (req, res) => {
       .json({ error: "Missing required fields" });
   }
 
-  // Find the doctor and check availability
   const doctor = await Doctor.findOne({ _id: doctorId });
 
   if (!doctor) {
@@ -48,7 +47,6 @@ const createBooking = async (req, res) => {
       .json({ error: `Doctor is not available on ${appointmentDate}` });
   }
 
-  // Make sure request time in the working hours of doctors
   let startTime = Number(availability.startTime.split(":")[0]);
   let endTime = Number(availability.endTime.split(":")[0]);
   let requestTime = Number(appointmentTime.split(":")[0]);
@@ -71,8 +69,7 @@ const createBooking = async (req, res) => {
       .json({ error: "This time slot is already booked" });
   }
 
-  // Create the booking
-  req.body.bookedBy = req.user._id;
+  req.body.bookedBy = req.user.userId;
   const booking = await Booking.create(req.body);
 
   res.status(StatusCodes.CREATED).json({ booking });
@@ -80,21 +77,17 @@ const createBooking = async (req, res) => {
 
 const updateBooking = async (req, res) => {
   const {
-    body: { doctorId, name, email, appointmentDate, appointmentTime, reason },
-    user: userId,
-    params: {id:bookingId},
+    body: { doctorId, appointmentDate, appointmentTime },
+    user: { userId },
+    params: { id: bookingId },
   } = req;
-  if (
-    doctorId === "" ||
-    name === "" ||
-    email === "" ||
-    appointmentDate === "" ||
-    appointmentTime === "" ||
-    reason === ""
-  ) {
-    return res.status(StatusCodes.BAD_REQUEST).send("Fields cannot be empty");
+
+  if (!doctorId || !appointmentDate || !appointmentTime) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .send("Required fields cannot be empty");
   }
-  // Find the doctor and check availability
+
   const doctor = await Doctor.findOne({ _id: doctorId });
 
   if (!doctor) {
@@ -112,7 +105,6 @@ const updateBooking = async (req, res) => {
       .json({ error: `Doctor is not available on ${appointmentDate}` });
   }
 
-  // Make sure request time in the working hours of doctors
   let startTime = Number(availability.startTime.split(":")[0]);
   let endTime = Number(availability.endTime.split(":")[0]);
   let requestTime = Number(appointmentTime.split(":")[0]);
@@ -127,23 +119,24 @@ const updateBooking = async (req, res) => {
     doctorId,
     appointmentDate,
     appointmentTime,
+    _id: { $ne: bookingId },
   });
 
   if (existingBooking) {
     return res
       .status(StatusCodes.CONFLICT)
-      .json({ error: "This time slot is already booked" });
+      .json({ error: "This time slot is already booked by another user" });
   }
 
   const booking = await Booking.findByIdAndUpdate(
-    { _id: bookingId, createdBy: userId },
+    { _id: bookingId, bookedBy: userId },
     req.body,
     { new: true, runValidators: true }
   );
   if (!booking) {
     return res
       .status(StatusCodes.NOT_FOUND)
-      .send(`No booking with ${bookingId}`);
+      .send(`No booking with id ${bookingId} found for this user`);
   }
   res.status(StatusCodes.OK).json({ booking });
 };
@@ -154,16 +147,20 @@ const deleteBooking = async (req, res) => {
     params: { id: bookingId },
   } = req;
 
-  const booking = Booking.findByIdAndDelete({_id:bookingId})
+  const booking = await Booking.findByIdAndDelete({
+    _id: bookingId,
+    bookedBy: userId,
+  });
 
   if (!booking) {
-    return res
-      .status(StatusCodes.NOT_FOUND)
-      .json({ error: `There is no booking with id ${bookingId}` });
+    return res.status(StatusCodes.NOT_FOUND).json({
+      error: `There is no booking with id ${bookingId} for this user`,
+    });
   }
-  res.status(StatusCodes.OK).send("Successfully removed the booking")
+  res.status(StatusCodes.OK).send("Successfully removed the booking");
 };
-module.exports = {
+
+export default {
   getAllBookings,
   getBooking,
   createBooking,
