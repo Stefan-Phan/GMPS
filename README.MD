@@ -8,8 +8,6 @@ A full-featured medical appointment booking system that allows users to register
 
 > Coming soon...
 
----
-
 ## 🚀 Tech Stack
 
 - **Backend**: Node.js, Express.js
@@ -17,8 +15,6 @@ A full-featured medical appointment booking system that allows users to register
 - **Authentication**: JWT + Bcrypt for secure access
 - **Email Notifications**: Nodemailer with SMTP (e.g. Gmail, SendGrid)
 - **AI Integration (Planned)**: OpenAI API for symptom advice, mental well-being, and prescription education
-
----
 
 ## 🔐 Features
 
@@ -29,8 +25,6 @@ A full-featured medical appointment booking system that allows users to register
 - 🧠 Future AI assistant: Get symptom advice before seeing a doctor
 - 👨‍⚕️ Admin panel: Manage doctors and their availability
 - 🛡️ Role-based access control (user/admin)
-
----
 
 ## 📡 API Endpoints
 
@@ -51,8 +45,6 @@ A full-featured medical appointment booking system that allows users to register
 | GET    | `/`      | Get all doctors       |
 | GET    | `/:id`   | Get a specific doctor |
 
----
-
 ### 🛠 Admin Doctor Management (`/api/v1/admin`)
 
 > Protected via `adminAuth` middleware
@@ -62,8 +54,6 @@ A full-featured medical appointment booking system that allows users to register
 | POST   | `/`      | Create a new doctor |
 | PATCH  | `/:id`   | Update doctor info  |
 | DELETE | `/:id`   | Remove a doctor     |
-
----
 
 ### 📅 Booking Routes (`/api/v1/bookings`)
 
@@ -78,8 +68,6 @@ A full-featured medical appointment booking system that allows users to register
 | DELETE | `/:id`              | Cancel a booking                       |
 | GET    | `/doctor/:doctorId` | Get all bookings for a specific doctor |
 
----
-
 ## 🧠 Future Feature: AI Health Assistant
 
 We plan to integrate OpenAI's GPT API to provide:
@@ -90,8 +78,6 @@ We plan to integrate OpenAI's GPT API to provide:
 
 > The AI assistant will not replace doctors, but offer first-level support and comfort.
 
----
-
 ## 📧 Email Integration
 
 Emails are sent for:
@@ -101,15 +87,11 @@ Emails are sent for:
 
 Powered by `nodemailer` and SMTP (e.g., Gmail, SendGrid).
 
----
-
 ## 🔒 Authentication
 
 - Uses **JWT (JSON Web Tokens)** for stateless auth
 - Passwords hashed using **bcrypt**
 - Routes protected by role (user/admin)
-
----
 
 ## ⚙️ Environment Variables (`.env`)
 
