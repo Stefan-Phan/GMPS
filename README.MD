@@ -1,134 +1,118 @@
-# General Medical Practice System (GMPS)
+# 🏥 General Medical Practice System (GMPS)
 
-## Overview
+A full-featured medical appointment booking system that allows users to register, browse available doctors, book appointments, and receive email notifications. Built with modern technologies and security best practices. Future development includes AI integration to support users with health-related advice before they see a doctor.
 
-The General Medical Practice System (GMPS) is a comprehensive backend solution designed to streamline the management of medical practices. Built with Node.js, Express.js, and MongoDB, this system provides a robust API for handling patient bookings, doctor information, and administrative tasks.
+---
 
-## Features
+## 🌐 Live Demo (Optional)
 
-- **User Booking Management**: Create, update, and modify appointments
-- **Doctor Availability**: View available doctors and their schedules
-- **Conflict Minimization**: Intelligent scheduling to reduce booking conflicts
-- **Admin Controls**: Add and modify doctor information
-- **Authentication**: Secure routes for users, doctors, and admins
+> Coming soon...
 
-## Technology Stack
+---
 
-- **Backend**: Node.js with Express.js
-- **Database**: MongoDB
-- **Authentication**: JSON Web Tokens (JWT)
+## 🚀 Tech Stack
 
-## Installation
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB with Mongoose ODM
+- **Authentication**: JWT + Bcrypt for secure access
+- **Email Notifications**: Nodemailer with SMTP (e.g. Gmail, SendGrid)
+- **AI Integration (Planned)**: OpenAI API for symptom advice, mental well-being, and prescription education
 
-1. Clone the repository:
-   ```
-   git clone https://github.com/Stefan-Phan/gmps.git
-   ```
+---
 
-2. Navigate to the project directory:
-   ```
-   cd gmps
-   ```
+## 🔐 Features
 
-3. Install dependencies:
-   ```
-   npm install
-   ```
+- 🔑 User registration & login (JWT)
+- 🧑‍⚕️ Browse available doctors with time slots
+- 📅 Book fixed 2-hour time slot appointments
+- 📧 Receive email confirmation and cancellation notices
+- 🧠 Future AI assistant: Get symptom advice before seeing a doctor
+- 👨‍⚕️ Admin panel: Manage doctors and their availability
+- 🛡️ Role-based access control (user/admin)
 
-4. Set up environment variables:
-   Create a `.env` file in the root directory and add the following:
-   ```
-   PORT=3000
-   MONGODB_URI=your_mongodb_connection_string
-   JWT_SECRET=your_jwt_secret
-   ```
+---
 
-5. Start the server:
-   ```
-   npm start
-   ```
+## 📡 API Endpoints
 
-## API Endpoints
+### 🔐 Auth Routes (`/api/v1/auth`)
 
-### Authentication
-- `POST /api/v1/auth/register`: Register a new user
-- `POST /api/v1/auth/login`: User login
+| Method | Endpoint    | Description          |
+| ------ | ----------- | -------------------- |
+| POST   | `/register` | Register a new user  |
+| POST   | `/login`    | Log in existing user |
+| GET    | `/logout`   | Log out the user     |
 
-### Bookings
-- `GET /api/v1/bookings`: Get all bookings (authenticated)
-- `POST /api/v1/bookings`: Create a new booking
-- `PUT /api/v1/bookings/:id`: Update a booking
-- `DELETE /api/v1/bookings/:id`: Cancel a booking
+---
 
-### Doctors
-- `GET /api/v1/doctors`: Get all doctors
-- `GET /api/v1/doctors/:id`: Get a specific doctor's details
+### 🧑‍⚕️ Doctor Routes (`/api/v1/doctors`)
 
-### Admin
-- `POST /api/v1/admin/doctors`: Add a new doctor (admin only)
-- `PUT /api/v1/admin/doctors/:id`: Update doctor information (admin only)
+| Method | Endpoint | Description           |
+| ------ | -------- | --------------------- |
+| GET    | `/`      | Get all doctors       |
+| GET    | `/:id`   | Get a specific doctor |
 
-## Authentication
+---
 
-The system uses JWT for authentication. Include the token in the Authorization header for protected routes:
+### 🛠 Admin Doctor Management (`/api/v1/admin`)
 
+> Protected via `adminAuth` middleware
+
+| Method | Endpoint | Description         |
+| ------ | -------- | ------------------- |
+| POST   | `/`      | Create a new doctor |
+| PATCH  | `/:id`   | Update doctor info  |
+| DELETE | `/:id`   | Remove a doctor     |
+
+---
+
+### 📅 Booking Routes (`/api/v1/bookings`)
+
+> Protected via `authenticateUser` middleware
+
+| Method | Endpoint            | Description                            |
+| ------ | ------------------- | -------------------------------------- |
+| GET    | `/`                 | Get all bookings (for the user)        |
+| POST   | `/`                 | Create a new booking                   |
+| GET    | `/:id`              | Get a specific booking                 |
+| PATCH  | `/:id`              | Update a booking                       |
+| DELETE | `/:id`              | Cancel a booking                       |
+| GET    | `/doctor/:doctorId` | Get all bookings for a specific doctor |
+
+---
+
+## 🧠 Future Feature: AI Health Assistant
+
+We plan to integrate OpenAI's GPT API to provide:
+
+- 💬 Symptom-based advice (pre-diagnosis suggestions)
+- 🧘‍♀️ Well-being support while waiting for appointments
+- 💊 Explanation on how to use common prescriptions
+
+> The AI assistant will not replace doctors, but offer first-level support and comfort.
+
+---
+
+## 📧 Email Integration
+
+Emails are sent for:
+
+- ✅ Booking confirmations
+- ❌ Booking cancellations
+
+Powered by `nodemailer` and SMTP (e.g., Gmail, SendGrid).
+
+---
+
+## 🔒 Authentication
+
+- Uses **JWT (JSON Web Tokens)** for stateless auth
+- Passwords hashed using **bcrypt**
+- Routes protected by role (user/admin)
+
+---
+
+## ⚙️ Environment Variables (`.env`)
+
+```env
+Please email me phannguyentuanhung2005@gmail.com if you guys want to get the .env file
 ```
-Authorization: Bearer YOUR_JWT_TOKEN
-```
-
-## Error Handling
-
-The API uses standard HTTP status codes for error responses. Common codes include:
-
-- 200: Success
-- 400: Bad Request
-- 401: Unauthorized
-- 403: Forbidden
-- 404: Not Found
-- 500: Internal Server Error
-
-## Data Models
-
-### User
-- `name`: String
-- `email`: String (unique)
-- `phoneNumber`: String
-- `password`: String (hashed)
-- `role`: String (enum: ['patient', 'admin'])
-
-### Booking
-- `patient`: ObjectId (ref: 'User')
-- `doctor`: ObjectId (ref: 'Doctor')
-- `name`: String
-- `email`: String
-- `appointmentDate`: String (enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"])
-- `appointmentTime`: String
-- `reason`: String
-- `status`: String (enum: ['scheduled', 'completed', 'cancelled'])
-
-### Doctor
-- `name`: String
-- `speciality`: String
-- `contactInfor`: (Email: String), (phone: String)
-- `availability`:
-   - `dayOfWeek`: String (enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"])
-   - `startTime`: String (default: 08:00)
-   - `endTime`: String (default: 17:00)
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a pull request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
-
-## Contact
-
-Stefan Phan - phannguyentuanhung2005gmail.com
-
-Project Link: https://github.com/Stefan-Phan/GMPS
