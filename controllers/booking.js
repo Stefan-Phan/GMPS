@@ -1,8 +1,12 @@
 import Booking from "../models/booking.js";
+import Doctor from "../models/doctor.js";
 import { StatusCodes } from "http-status-codes";
 import { validateBookingFields } from "../middleware/validateBookingFields.js";
 import { checkDoctorAvailability } from "../middleware/checkDoctorAvailability.js";
-import { sendBookingConfirmation } from "../utils/sendEmail.js";
+import {
+  sendBookingCancellation,
+  sendBookingConfirmation,
+} from "../utils/sendEmail.js";
 
 const getAllBookings = async (req, res) => {
   const bookings = await Booking.find().sort("appointmentDate");
@@ -132,6 +136,20 @@ const deleteBooking = async (req, res) => {
     return res.status(StatusCodes.NOT_FOUND).json({
       error: `There is no booking with id ${bookingId} for this user`,
     });
+  }
+
+  const doctor = await Doctor.findById(booking.doctorId);
+
+  try {
+    await sendBookingCancellation({
+      to: booking.email,
+      name: booking.name,
+      doctorName: doctor?.name || "your doctor",
+      date: booking.appointmentDate,
+      slot: booking.slot,
+    });
+  } catch (err) {
+    console.error("Failed to send cancellation email:", err);
   }
 
   res.status(StatusCodes.OK).send("Successfully removed the booking");
