@@ -1,12 +1,6 @@
 import { Schema, model } from "mongoose";
-
-const defaultAvailability = [
-  { dayOfWeek: "Monday", startTime: "9:00", endTime: "17:00" },
-  { dayOfWeek: "Tuesday", startTime: "9:00", endTime: "17:00" },
-  { dayOfWeek: "Wednesday", startTime: "9:00", endTime: "17:00" },
-  { dayOfWeek: "Thursday", startTime: "9:00", endTime: "17:00" },
-  { dayOfWeek: "Friday", startTime: "9:00", endTime: "17:00" },
-];
+import { DEFAULT_DOCTOR_AVAILABILITY } from "../constants/defaultDoctorAvailability.js";
+import { FIXED_TIME_SLOTS } from "../constants/timeSlots.js";
 
 const DoctorSchema = new Schema({
   name: {
@@ -36,19 +30,16 @@ const DoctorSchema = new Schema({
         dayOfWeek: {
           type: String,
           enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-          required: [true, "Please provide a day"],
+          required: true,
         },
-        startTime: {
-          type: String,
-          default: "8:00",
-        },
-        endTime: {
-          type: String,
-          default: "17:00",
+        availableSlots: {
+          type: [String],
+          enum: FIXED_TIME_SLOTS,
+          required: true,
         },
       },
     ],
-    default: defaultAvailability,
+    default: DEFAULT_DOCTOR_AVAILABILITY,
   },
 });
 

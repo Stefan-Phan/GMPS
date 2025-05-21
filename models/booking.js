@@ -1,67 +1,54 @@
 import { Schema, Types, model } from "mongoose";
 
 import validator from "validator";
+import { FIXED_TIME_SLOTS } from "../constants/timeSlots.js";
 
 const { isEmail } = validator;
 
-const TIME_SLOTS = [
-  { start: "09:00", end: "11:00" },
-  { start: "11:00", end: "13:00" },
-  { start: "13:00", end: "15:00" },
-  { start: "15:00", end: "17:00" },
-];
-
-const BookingSchema = new Schema(
-  {
-    doctorId: {
-      type: Types.ObjectId,
-      ref: "Doctor",
-    },
-    name: {
-      type: String,
-      required: [true, "Please provide name"],
-      minlength: [3, "name must be at least 3 characters long"],
-      maxlength: [50, "name must be at most 50 characters long"],
-    },
-    email: {
-      type: String,
-      required: [true, "Please provide email"],
-      validate: {
-        validator: (value) => isEmail(value),
-        message: "Email must be valid",
-      },
-    },
-    appointmentDate: {
-      type: String,
-      enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-      required: [true, "Please provide the appointment date"],
-    },
-    appointmentStartTime: {
-      type: String,
-      required: [true, "Please provide the appointment start time"],
-      enum: ["09:00", "11:00", "13:00", "15:00"],
-    },
-    appointmentEndTime: {
-      type: String,
-      required: [true, "Please provide the appointment end time"],
-      enum: ["11:00", "13:00", "15:00", "17:00"],
-    },
-    reason: {
-      type: String,
-      required: [true, "Please provide the reason"],
-    },
-    status: {
-      type: String,
-      enum: ["Scheduled", "Completed", "Cancelled"],
-      default: "Scheduled",
-    },
-    // bookedBy: {
-    //   type: mongoose.Types.ObjectId,
-    //   ref: "User",
-    //   required: [true, "Please provide patient ID"],
-    // },
+const BookingSchema = new Schema({
+  doctorId: {
+    type: Types.ObjectId,
+    ref: "Doctor",
+    required: true,
   },
-  { timestamps: true }
-);
+  name: {
+    type: String,
+    required: [true, "Please provide name"],
+    minlength: [3, "name must be at least 3 characters long"],
+    maxlength: [50, "name must be at most 50 characters long"],
+  },
+  email: {
+    type: String,
+    required: [true, "Please provide email"],
+    validate: {
+      validator: (value) => isEmail(value),
+      message: "Email must be valid",
+    },
+  },
+  appointmentDate: {
+    type: String,
+    enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    required: [true, "Please provide the appointment date"],
+  },
+  slot: {
+    type: String,
+    required: [true, "Please select an appointment slot"],
+    enum: FIXED_TIME_SLOTS,
+  },
+  reason: {
+    type: String,
+    required: [true, "Please provide the reason"],
+  },
+  status: {
+    type: String,
+    enum: ["Scheduled", "Completed", "Cancelled"],
+    default: "Scheduled",
+  },
+  bookedBy: {
+    type: Types.ObjectId,
+    ref: "User",
+    required: [true, "Please provide patient ID"],
+  },
+});
 
 export default model("Booking", BookingSchema);

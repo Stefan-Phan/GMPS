@@ -1,68 +1,43 @@
 import Booking from "../models/booking.js";
-import Doctor from "../models/doctor.js";
 import { StatusCodes } from "http-status-codes";
+import { validateBookingFields } from "../middleware/validateBookingFields.js";
+import { checkDoctorAvailability } from "../middleware/checkDoctorAvailability.js";
 
 const getAllBookings = async (req, res) => {
-  const bookings = await Booking.find()
-    .sort("appointmentDate")
-    .sort("appointmentTime");
+  const bookings = await Booking.find().sort("appointmentDate");
   res.status(StatusCodes.OK).json({ bookings, count: bookings.length });
 };
 
 const getBooking = async (req, res) => {
-  const bookingId = req.params.id;
-
-  const booking = await Booking.findOne({ _id: bookingId });
+  const booking = await Booking.findById(req.params.id);
   if (!booking) {
     return res
       .status(StatusCodes.NOT_FOUND)
-      .json({ error: `There is no booking with id ${bookingId}` });
+      .json({ error: `There is no booking with id ${req.params.id}` });
   }
+
   res.status(StatusCodes.OK).json({ booking });
 };
 
 const createBooking = async (req, res) => {
-  const { doctorId, appointmentDate, appointmentTime } = req.body;
+  const { doctorId, appointmentDate, slot } = req.body;
 
-  if (!doctorId || !appointmentDate || !appointmentTime) {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .json({ error: "Missing required fields" });
-  }
+  if (!validateBookingFields(doctorId, appointmentDate, slot, res)) return;
 
-  const doctor = await Doctor.findOne({ _id: doctorId });
-
-  if (!doctor) {
-    return res
-      .status(StatusCodes.NOT_FOUND)
-      .json({ error: "Doctor not found" });
-  }
-
-  const availability = doctor.availability.find(
-    (avail) => avail.dayOfWeek === appointmentDate
+  const doctor = await checkDoctorAvailability(
+    doctorId,
+    appointmentDate,
+    slot,
+    res
   );
-  if (!availability) {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .json({ error: `Doctor is not available on ${appointmentDate}` });
-  }
 
-  let startTime = Number(availability.startTime.split(":")[0]);
-  let endTime = Number(availability.endTime.split(":")[0]);
-  let requestTime = Number(appointmentTime.split(":")[0]);
-
-  if (requestTime > endTime || requestTime < startTime) {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .json({ error: "Appointment time is outside doctor's working hours" });
-  }
+  if (!doctor) return;
 
   const existingBooking = await Booking.findOne({
     doctorId,
     appointmentDate,
-    appointmentTime,
+    slot,
   });
-
   if (existingBooking) {
     return res
       .status(StatusCodes.CONFLICT)
@@ -71,83 +46,57 @@ const createBooking = async (req, res) => {
 
   req.body.bookedBy = req.user.userId;
   const booking = await Booking.create(req.body);
-
   res.status(StatusCodes.CREATED).json({ booking });
 };
 
 const updateBooking = async (req, res) => {
-  const {
-    body: { doctorId, appointmentDate, appointmentTime },
-    user: { userId },
-    params: { id: bookingId },
-  } = req;
+  const { doctorId, appointmentDate, slot } = req.body;
+  const { id: bookingId } = req.params;
+  const { userId } = req.user;
 
-  if (!doctorId || !appointmentDate || !appointmentTime) {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .send("Required fields cannot be empty");
-  }
+  if (!validateBookingFields(doctorId, appointmentDate, slot, res)) return;
 
-  const doctor = await Doctor.findOne({ _id: doctorId });
-
-  if (!doctor) {
-    return res
-      .status(StatusCodes.NOT_FOUND)
-      .json({ error: "Doctor not found" });
-  }
-
-  const availability = doctor.availability.find(
-    (avail) => avail.dayOfWeek === appointmentDate
+  const doctor = await checkDoctorAvailability(
+    doctorId,
+    appointmentDate,
+    slot,
+    res
   );
-  if (!availability) {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .json({ error: `Doctor is not available on ${appointmentDate}` });
-  }
-
-  let startTime = Number(availability.startTime.split(":")[0]);
-  let endTime = Number(availability.endTime.split(":")[0]);
-  let requestTime = Number(appointmentTime.split(":")[0]);
-
-  if (requestTime > endTime || requestTime < startTime) {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .json({ error: "Appointment time is outside doctor's working hours" });
-  }
+  if (!doctor) return;
 
   const existingBooking = await Booking.findOne({
     doctorId,
     appointmentDate,
-    appointmentTime,
+    slot,
     _id: { $ne: bookingId },
   });
 
   if (existingBooking) {
     return res
       .status(StatusCodes.CONFLICT)
-      .json({ error: "This time slot is already booked by another user" });
+      .json({ error: "This slot is already booked by another user" });
   }
 
-  const booking = await Booking.findByIdAndUpdate(
+  const booking = await Booking.findOneAndUpdate(
     { _id: bookingId, bookedBy: userId },
     req.body,
     { new: true, runValidators: true }
   );
+
   if (!booking) {
     return res
       .status(StatusCodes.NOT_FOUND)
-      .send(`No booking with id ${bookingId} found for this user`);
+      .json({ error: `No booking with id ${bookingId} found for this user` });
   }
+
   res.status(StatusCodes.OK).json({ booking });
 };
 
 const deleteBooking = async (req, res) => {
-  const {
-    user: { userId },
-    params: { id: bookingId },
-  } = req;
+  const { id: bookingId } = req.params;
+  const { userId } = req.user;
 
-  const booking = await Booking.findByIdAndDelete({
+  const booking = await Booking.findOneAndDelete({
     _id: bookingId,
     bookedBy: userId,
   });
@@ -157,6 +106,7 @@ const deleteBooking = async (req, res) => {
       error: `There is no booking with id ${bookingId} for this user`,
     });
   }
+
   res.status(StatusCodes.OK).send("Successfully removed the booking");
 };
 
