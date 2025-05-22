@@ -10,6 +10,7 @@ import authRouter from "./routes/auth.js";
 import bookingRouter from "./routes/booking.js";
 import doctorRouter from "./routes/doctor.js";
 import adminRouter from "./routes/admin/ad_doctor.js";
+import aiRouter from "./routes/ai.js";
 
 // --- Middleware Imports ---
 import authenticateUser from "./middleware/authentication.js";
@@ -29,6 +30,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/doctors", doctorRouter);
 app.use("/api/v1/bookings", authenticateUser, bookingRouter);
 app.use("/api/v1/admin", adminAuth, adminRouter);
+app.use("/api/v1/ai", aiRouter);
 
 // --- Error Handling Middleware ---
 app.use(notFoundMiddleWare);
