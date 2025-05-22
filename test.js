@@ -24,5 +24,8 @@ export const getHealthAdvice = async (userInput) => {
     ],
   });
 
-  return completion.choices.message.content;
+  console.log(completion.choices[0].message.content);
+  return completion.choices[0].message.content;
 };
+
+getHealthAdvice("I have a headache");
