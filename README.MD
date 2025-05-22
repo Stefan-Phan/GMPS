@@ -12,7 +12,7 @@ A full-featured medical appointment booking system that allows users to register
 - **Database**: MongoDB with Mongoose ODM
 - **Authentication**: JWT + Bcrypt for secure access
 - **Email Notifications**: Nodemailer with SMTP (e.g. Gmail, SendGrid)
-- **AI Integration (Planned)**: OpenAI API for symptom advice, mental well-being, and prescription education
+- **AI Integration**: OpenAI API for symptom advice, mental well-being, and prescription education
 
 ## 🔐 Features
 
