@@ -2,8 +2,8 @@ import { Router } from "express";
 import aiController from "../controllers/ai.js";
 
 const router = Router();
-const { getSymptonAdvice } = aiController;
+const { getSymptonAdvice, getRecentAIQuestions } = aiController;
 
-router.post("/", getSymptonAdvice);
+router.get("/", getRecentAIQuestions).post("/", getSymptonAdvice);
 
 export default router;

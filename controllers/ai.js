@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
+import qaLog from "../models/qaLog.js";
 import { getSmartHealthAdvice } from "../utils/getSmartHealthAdvice.js";
-import { getHealthAdvice } from "../utils/aiAssistant.js";
 
 const getSymptonAdvice = async (req, res) => {
   const { question } = req.body;
@@ -13,9 +13,7 @@ const getSymptonAdvice = async (req, res) => {
 
   try {
     const { answer, fromCache } = await getSmartHealthAdvice(question);
-    // const { answer } = await getHealthAdvice(question);
     return res.status(200).json({ answer, fromCache });
-    // return res.status(200).json({ answer });
   } catch (err) {
     return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -23,4 +21,12 @@ const getSymptonAdvice = async (req, res) => {
   }
 };
 
-export default { getSymptonAdvice };
+const getRecentAIQuestions = async (req, res) => {
+  const recentLogs = await qaLog.find({}).sort({ createdAt: -1 }).limit(5);
+
+  return res
+    .status(StatusCodes.OK)
+    .json({ count: recentLogs.length, recentLogs });
+};
+
+export default { getSymptonAdvice, getRecentAIQuestions };

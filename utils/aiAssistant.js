@@ -19,7 +19,6 @@ Focus on hydration, rest, and reassurance. Do NOT give a diagnosis.
 
     const result = await model.generateContent(prompt);
     const response = result.response.text();
-    console.log(response);
     return response;
   } catch (error) {
     throw error;
