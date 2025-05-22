@@ -1,28 +1,27 @@
-import OpenAI from "openai";
-
 import dotenv from "dotenv";
 dotenv.config();
 
-const openai = new OpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY,
-});
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export const getHealthAdvice = async (userInput) => {
-  const completion = await openai.chat.completions.create({
-    model: "meta-llama/llama-4-maverick:free",
-    messages: [
-      {
-        role: "system",
-        content:
-          "You are a helpful medical assistant. Provide symptom advice, emotional support, and safe prescription guidance. Do not make medical diagnoses.",
-      },
-      {
-        role: "user",
-        content: userInput,
-      },
-    ],
-  });
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-  return completion.choices[0].message.content;
+    const prompt = `
+You are a compassionate medical assistant. A patient says:
+"${userInput}"
+
+Give clear and safe advice they can follow at home before seeing a doctor.
+Focus on hydration, rest, and reassurance. Do NOT give a diagnosis.
+`;
+
+    const result = await model.generateContent(prompt);
+    const response = result.response.text();
+    console.log(response);
+    return response;
+  } catch (error) {
+    throw error;
+  }
 };
