@@ -101,7 +101,7 @@ Each AI interaction is cached with:
 
 - `question` and `normalizedQuestion`
 - `answer`
-- `userId` and `timestamp`
+- `timestamp`
 
 This allows:
 
