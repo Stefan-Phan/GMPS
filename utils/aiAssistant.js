@@ -24,5 +24,5 @@ export const getHealthAdvice = async (userInput) => {
     ],
   });
 
-  return completion.choices.message.content;
+  return completion.choices[0].message.content;
 };
