@@ -4,6 +4,6 @@ import aiController from "../controllers/ai.js";
 const router = Router();
 const { getSymptonAdvice } = aiController;
 
-router.post("/advice", getSymptonAdvice);
+router.post("/", getSymptonAdvice);
 
 export default router;
