@@ -1,28 +1,30 @@
 # 🏥 General Medical Practice System (GMPS)
 
-A full-featured medical appointment booking system that allows users to register, browse available doctors, book appointments, and receive email notifications. Built with modern technologies and security best practices. Future development includes AI integration to support users with health-related advice before they see a doctor.
+A full-featured medical appointment booking system that allows users to register, browse available doctors, book appointments, and receive email notifications. Now enhanced with **Gemini AI** for health-related advice and a **MongoDB Q&A cache** to reduce redundant API calls and cost.
 
-## 🌐 Live Demo (Optional)
+## 🌐 Live Demo
 
 > Coming soon...
 
 ## 🚀 Tech Stack
 
 - **Backend**: Node.js, Express.js
-- **Database**: MongoDB with Mongoose ODM
-- **Authentication**: JWT + Bcrypt for secure access
-- **Email Notifications**: Nodemailer with SMTP (e.g. Gmail, SendGrid)
-- **AI Integration**: OpenAI API for symptom advice, mental well-being, and prescription education
+- **Database**: MongoDB (with Mongoose)
+- **Authentication**: JWT, bcrypt
+- **Email Notifications**: Nodemailer (Gmail/SMTP)
+- **AI Integration**: Gemini API via Google Generative AI
+- **Caching**: MongoDB QALog model to store AI Q&A pairs
 
 ## 🔐 Features
 
-- 🔑 User registration & login (JWT)
-- 🧑‍⚕️ Browse available doctors with time slots
-- 📅 Book fixed 2-hour time slot appointments
-- 📧 Receive email confirmation and cancellation notices
-- 🧠 Future AI assistant: Get symptom advice before seeing a doctor
-- 👨‍⚕️ Admin panel: Manage doctors and their availability
-- 🛡️ Role-based access control (user/admin)
+- 🔑 User registration and login with secure JWT auth
+- 🧑‍⚕️ View all available doctors
+- 📅 Book fixed 2-hour appointment slots
+- 📧 Email confirmation and cancellation notices
+- 🧠 AI assistant for pre-diagnosis symptom advice
+- 🧠 Q&A log system to cache AI responses
+- 👨‍⚕️ Admin tools to manage doctor records
+- 🛡️ Role-based access control (admin, doctor, patient)
 
 ## 📡 API Endpoints
 
@@ -43,54 +45,72 @@ A full-featured medical appointment booking system that allows users to register
 
 ### 🛠 Admin Doctor Management (`/api/v1/admin`)
 
-> Protected via `adminAuth` middleware
+> Protected via `adminAuth`
 
 | Method | Endpoint | Description         |
 | ------ | -------- | ------------------- |
 | POST   | `/`      | Create a new doctor |
 | PATCH  | `/:id`   | Update doctor info  |
-| DELETE | `/:id`   | Remove a doctor     |
+| DELETE | `/:id`   | Delete a doctor     |
 
 ### 📅 Booking Routes (`/api/v1/bookings`)
 
-> Protected via `authenticateUser` middleware
+> Protected via `authenticateUser`
 
 | Method | Endpoint            | Description                            |
 | ------ | ------------------- | -------------------------------------- |
-| GET    | `/`                 | Get all bookings (for the user)        |
+| GET    | `/`                 | Get all bookings for the user          |
 | POST   | `/`                 | Create a new booking                   |
-| GET    | `/:id`              | Get a specific booking                 |
+| GET    | `/:id`              | Get details of a specific booking      |
 | PATCH  | `/:id`              | Update a booking                       |
 | DELETE | `/:id`              | Cancel a booking                       |
 | GET    | `/doctor/:doctorId` | Get all bookings for a specific doctor |
 
-## 🧠 Future Feature: AI Health Assistant
+### 🧠 AI Assistant (`/api/v1/ai`)
 
-We plan to integrate OpenAI's GPT API to provide:
+| Method | Endpoint | Description                              |
+| ------ | -------- | ---------------------------------------- |
+| POST   | `/`      | Ask a symptom-related question to Gemini |
+| GET    | `/`      | Get the 5 most recent AI Q&A entries     |
 
-- 💬 Symptom-based advice (pre-diagnosis suggestions)
-- 🧘‍♀️ Well-being support while waiting for appointments
-- 💊 Explanation on how to use common prescriptions
+## 🧠 AI Health Assistant (Powered by Gemini)
 
-> The AI assistant will not replace doctors, but offer first-level support and comfort.
+- ✅ Ask questions like _"I have a sore throat, what should I do?"_
+- 🧠 Get safe pre-consultation advice via Gemini AI (Google Generative AI)
+- 💾 AI answers are cached in MongoDB (`QALog`) to prevent duplicate calls and reduce cost
+- 🔄 Supports reuse of past answers for repeated questions
 
 ## 📧 Email Integration
 
-Emails are sent for:
+Emails are automatically sent when:
 
-- ✅ Booking confirmations
-- ❌ Booking cancellations
+- ✅ Booking is confirmed
+- ❌ Booking is canceled
 
-Powered by `nodemailer` and SMTP (e.g., Gmail, SendGrid).
+Uses Nodemailer via Gmail SMTP.
 
 ## 🔒 Authentication
 
-- Uses **JWT (JSON Web Tokens)** for stateless auth
-- Passwords hashed using **bcrypt**
-- Routes protected by role (user/admin)
+- Users authenticate via **JWT**
+- Passwords are securely hashed using **bcrypt**
+- Admins and doctors use **role-based access control**
+
+## 🧪 Caching Layer: QALog Model
+
+Each AI interaction is cached with:
+
+- `question` and `normalizedQuestion`
+- `answer`
+- `userId` and `timestamp`
+
+This allows:
+
+- Instant reuse of previous AI answers
+- Reduced API usage for Gemini
+- Recent Q&A query via `/api/v1/ai`
 
 ## ⚙️ Environment Variables (`.env`)
 
 ```env
-Please email me phannguyentuanhung2005@gmail.com if you guys want to get the .env file
+If you need a sample .env file, contact: phannguyentuanhung2005@gmail.com
 ```
